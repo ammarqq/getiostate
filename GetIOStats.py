@@ -48,8 +48,8 @@ def parse_script_arguments(arg_args):
             elif _option in ("-p", "--partition"):
                 # not used yet
                 _partition = _argument.lower()
-                print ""
-                print "Argument not yet implemented."
+                print("")
+                print("Argument not yet implemented.")
                 show_help()
                 sys.exit(2)
             elif _option in ("-t", "--timetorun"):
@@ -59,8 +59,8 @@ def parse_script_arguments(arg_args):
                 if _timeToRun[len(_timeToRun)-1:len(_timeToRun)].upper() == "M":
                     _timeToRun = int(_timeToRun[0:(len(_timeToRun) - 1)])
                 else:
-                    print ""
-                    print "Please specify a valid time to run value in hour(s) (H) or minutes (M) with -t/--timetorun."
+                    print("")
+                    print("Please specify a valid time to run value in hour(s) (H) or minutes (M) with -t/--timetorun.")
                     show_help()
                     sys.exit(2)
             elif _option in ("-i", "--interval"):
@@ -79,15 +79,15 @@ def parse_script_arguments(arg_args):
         if _timeToRun == 0:
             _timeToRun = DEFAULT_TIMETORUN
         elif _timeToRun > HARDLIMIT_TIMETORUN:
-            print ""
-            print "Please specify a time to run less than 2 hours (120 minutes)."
+            print ("")  
+            print ("Please specify a time to run less than 2 hours (120 minutes).")
             show_help()
             sys.exit(2)
         if _collectionInterval == 0:
             _collectionInterval = DEFAULT_COLLECTIONINTERVAL
     else:
-        print ""
-        print "Please specify an existing device with -d/--device or an existing partition with -/--partition."
+        print ("")
+        print ("Please specify an existing device with -d/--device or an existing partition with -/--partition.")
         show_help()
         sys.exit(2)
 
@@ -103,29 +103,29 @@ def verify_device_exists(_device):
                 _devices.append(_item)
 
     if len(_devices) == 0:
-        print "No device found matching criteria."
-        print "Exiting..."
+        print ("No device found matching criteria.")
+        print ("Exiting...")
         sys.exit()
 
     if _device == "all":
-        print "All disks statistics will be collected"
+        print ("All disks statistics will be collected")
 
 
 def show_help():
-    print ""
-    print "get_io_stats.py -d <device(s)|all> -t <time to run (H|M)> -i <interval (seconds)>"
-    print "Version: " + SCRIPT_VERSION
-    print ""
-    print "Collect I/O statistics from devices or partitions on Linux systems."
-    print ""
-    print "Examples:"
-    print " -> Collect I/O statistics for device sdc during 10 minutes at a 25ms interval"
-    print "get_io_stats.py -d sdc -t 10M -i 0.025"
-    print " -> Collect I/O statistics for all devices during 1 hour at a 1 second interval"
-    print "get_io_stats.py -d all -t 1H -i 1"
-    print " -> Collect I/O statistics for sdc and sdb devices during 15 minutes with default interval (1 second)"
-    print "get_io_stats.py -d sdc,sdb -t 15M"
-    print ""
+    print ("")
+    print ("get_io_stats.py -d <device(s)|all> -t <time to run (H|M)> -i <interval (seconds)>")
+    print ("Version: " + SCRIPT_VERSION)
+    print ("")
+    print ("Collect I/O statistics from devices or partitions on Linux systems.")
+    print ("")
+    print ("Examples:")
+    print (" -> Collect I/O statistics for device sdc during 10 minutes at a 25ms interval")
+    print ("get_io_stats.py -d sdc -t 10M -i 0.025")
+    print (" -> Collect I/O statistics for all devices during 1 hour at a 1 second interval")
+    print ("get_io_stats.py -d all -t 1H -i 1")
+    print (" -> Collect I/O statistics for sdc and sdb devices during 15 minutes with default interval (1 second)")
+    print ("get_io_stats.py -d sdc,sdb -t 15M")
+    print ("")
 
 
 def init():
@@ -179,7 +179,7 @@ def get_io_stats(_device, _interval, _captureTimeMin):
     _timeRunning = 0
 
     if len(_device.split(",")) > 1:
-        print " Capturing I/O usage for multiple disks..."
+        print (" Capturing I/O usage for multiple disks...")
         _devices = []
         if len(_device.split(",")) > 1:
             for _item in _device.split(","):
@@ -198,7 +198,7 @@ def get_io_stats(_device, _interval, _captureTimeMin):
             time.sleep(_interval)
 
     if _device == "all":
-        print " Capturing I/O usage for all disks..."
+        print (" Capturing I/O usage for all disks...")
         while _timeRunning <= int(_timeToRun):
             _diskStatsfile = open("/proc/diskstats", "r")
             for line in _diskStatsfile:
@@ -209,11 +209,11 @@ def get_io_stats(_device, _interval, _captureTimeMin):
             _diskStatsfile.close()
             time.sleep(_interval)
     else:
-        print " Capturing I/O usage for a single disk..."
+        print (" Capturing I/O usage for a single disk...")
         # if partition: /sys/block/[device]/[partion]/stat
 
         if kernel_version >= ENHANCED_KERNELVERSION:
-            print " Capturing from /sys/block"
+            print (" Capturing from /sys/block")
             while _timeRunning <= int(_timeToRun):
                 _diskStatsfile = open('/sys/block/' + _device + '/stat', "r")
                 for line in _diskStatsfile:
@@ -222,7 +222,7 @@ def get_io_stats(_device, _interval, _captureTimeMin):
                 time.sleep(_interval)
                 _diskStatsfile.close()
         else:
-            print " Capturing from /proc/diskstats"
+            print (" Capturing from /proc/diskstats")
             while _timeRunning <= int(_timeToRun):
                 _diskStatsfile = open("/proc/diskstats", "r")
                 for line in _diskStatsfile:
@@ -281,7 +281,7 @@ def compute_io_stats_all_disks(_iostats, _device):
 
     _dateTime = datetime.utcnow().strftime('%Y-%m-%d_%H:%M:%S').replace(":","-")
 
-    print " Compute all disks metrics..."
+    print (" Compute all disks metrics...")
 
     _uniqueItems = []
     if len(_device.split(",")) > 1:
@@ -326,7 +326,7 @@ def compute_io_stats_all_disks(_iostats, _device):
                 else:
                     if len(_stat.split()) == 17:
                         # Linux 2.4
-                        print "  Looks like kernel version is lower than 2.6 (" + _item + ")"
+                        print ("  Looks like kernel version is lower than 2.6 (" + _item + ")")
                     elif len(_stat.split()) == 16 or len(_stat.split()) == 20:
                         # Linux 2.6+ for a device or partition (using /proc/disktats)
                         # [5] reads [6] reads merged [7] sectors read [8] ms spent reading [9] writes [10] writes merged [11] sectors written [12] ms spent writing [13] I/O in progress [14] ms doing I/O [15] weighted ms doing I/Os
@@ -337,7 +337,7 @@ def compute_io_stats_all_disks(_iostats, _device):
                     elif len(_stat.split()) == 9:
                         # Linux 2.6+ for a partition
                         # [3] reads [4] sectors read [5] writes [6] sectors written
-                        print "  Looks like partition data (" + _item + ")"
+                        print ("  Looks like partition data (" + _item + ")")
 
                     _rBytes = _deltaReadSectors * int(_sectorSize)
                     _wBytes = _deltaWriteSectors * int(_sectorSize)
@@ -347,7 +347,7 @@ def compute_io_stats_all_disks(_iostats, _device):
                     _outputLine = ''
                     if len(_stat.split()) == 17:
                         # Linux 2.4
-                        print "  Looks like kernel version is lower than 2.6 (" + _item + ")"
+                        print ("  Looks like kernel version is lower than 2.6 (" + _item + ")")
                     if len(_stat.split()) == 16 or len(_stat.split()) == 20:
                         # Linux 2.6+ for a device
                         _previousReads = int(_stat.split()[5])
@@ -370,7 +370,7 @@ def compute_io_stats_all_disks(_iostats, _device):
                                 + _stat.split()[15]
                     if len(_stat.split()) == 7:
                         # Linux 2.6+ for a partition
-                        print "  Looks like partition data (" + _item + ")"
+                        print ("  Looks like partition data (" + _item + ")")
 
                     if int(_deltaReadSectors + _deltaWriteSectors) >= 0 and _deltaTime >= 0:
                         # Exclude initial data that will bring inaccuracy
@@ -399,7 +399,7 @@ def compute_io_stats_single_disk(_iostats, _device):
 
     _dateTime = datetime.utcnow().strftime('%Y-%m-%d_%H:%M:%S').replace(":","-")
 
-    print " Compute disk" + _device + " metrics..."
+    print (" Compute disk" + _device + " metrics...")
 
     _sectorSize = get_device_sector_size(_device)
     _outputfile = "./" + os.uname()[1] + "_" + _device + "_" + _dateTime + "_" + str(int(_sectorSize)) + ".log"
@@ -551,24 +551,24 @@ if __name__ == '__main__':
 
     kernel_version = init()
 
-    print ""
-    print "GetIOStats.py - Script version: " + SCRIPT_VERSION
-    print "- Collect high resolution IO stats from disk devices on Linux -"
-    print "Kernel version: " + str(kernel_version)
+    print ("")
+    print ("GetIOStats.py - Script version: " + SCRIPT_VERSION)
+    print ("- Collect high resolution IO stats from disk devices on Linux -")
+    print ("Kernel version: " + str(kernel_version))
     if kernel_version < 2.6:
-        print "This Linux kernel version (" + str(kernel_version) + ") is not supported."
-        print "Exiting..."
+        print ("This Linux kernel version (" + str(kernel_version) + ") is not supported.")
+        print ("Exiting...")
         sys.exit()
 
-    print datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') + " - Capturing I/Os metrics for device(s): " + scriptArguments[0] + ". Estimated duration: " + str(scriptArguments[1]) + " minute(s), interval: " + str(scriptArguments[2]) + " " + scriptArguments[3] + ". No output during capture."
-    print " Data is kept in memory so if this script is interrupted, no data will be collected."
+    print (datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') + " - Capturing I/Os metrics for device(s): " + scriptArguments[0] + ". Estimated duration: " + str(scriptArguments[1]) + " minute(s), interval: " + str(scriptArguments[2]) + " " + scriptArguments[3] + ". No output during capture.")
+    print (" Data is kept in memory so if this script is interrupted, no data will be collected.")
     ioStats = get_io_stats(scriptArguments[0], float(scriptArguments[2]), int(scriptArguments[1]))
 
     # Process collected data and flush to output files
-    print ""
-    print datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') + " - Processing I/O statistics and flushing to file: " + str(len(ioStats)) + " samples."
+    print ("")
+    print (datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') + " - Processing I/O statistics and flushing to file: " + str(len(ioStats)) + " samples.")
     compute_io_stats(ioStats, scriptArguments[0])
 
-    print ""
-    print datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') + " - Process Completed. Please send the log file(s) to the Microsoft support engineer."
-    print ""
+    print ("")
+    print (datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') + " - Process Completed. Please send the log file(s) to the Microsoft support engineer.")
+    print ("")
